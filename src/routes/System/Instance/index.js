@@ -271,7 +271,9 @@ export default class Instance extends Component {
       series: formattedSeries,
     };
 
-    this.lineChartInstance.setOption(option);
+    // Replace the series instead of merging them by index, so that lines of the
+    // previous namespace don't stay on the chart when the new one has fewer.
+    this.lineChartInstance.setOption(option, { replaceMerge: ["series"] });
   };
 
   pageOnchange = (page) => {

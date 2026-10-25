@@ -110,6 +110,26 @@ describe("chart rendering after the analysis is cleared", () => {
     expect(lineDiv.textContent).toContain("SHENYU.INSTANCE.NO_DATA");
   });
 
+  it("removes the lines of the previous data when there are fewer", () => {
+    component.renderLineChart([
+      { name: "a", data: [1, 2, 3] },
+      { name: "b", data: [2, 3, 4] },
+      { name: "c", data: [3, 4, 0] },
+    ]);
+    expect(component.lineChartInstance.getOption().series).toHaveLength(3);
+
+    component.renderLineChart([{ name: "d", data: [0, 1, 2] }]);
+    const { series } = component.lineChartInstance.getOption();
+    expect(series).toHaveLength(1);
+    expect(series[0]).toMatchObject({ name: "d", data: [0, 1, 2] });
+
+    component.renderLineChart([]);
+    const [placeholder, ...rest] =
+      component.lineChartInstance.getOption().series;
+    expect(rest).toHaveLength(0);
+    expect(placeholder).toMatchObject({ name: "SHENYU.INSTANCE.NO_DATA" });
+  });
+
   it("skips rendering while the chart data is undefined", () => {
     const pieSetOption = jest.spyOn(component.pieChartInstance, "setOption");
     const lineSetOption = jest.spyOn(component.lineChartInstance, "setOption");
